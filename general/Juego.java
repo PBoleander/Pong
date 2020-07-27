@@ -3,11 +3,11 @@ package general;
 import elementos.Barra;
 import elementos.Bola;
 
-import javax.sound.sampled.Line;
-import java.awt.*;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.geom.Line2D;
 
 class Juego implements KeyListener, Runnable {
 
@@ -27,7 +27,7 @@ class Juego implements KeyListener, Runnable {
     public void keyTyped(KeyEvent keyEvent) {}
 
     @Override
-    public void keyPressed(KeyEvent keyEvent) {
+    public synchronized void keyPressed(KeyEvent keyEvent) {
         int tecla = keyEvent.getKeyCode();
         if (!pausa && (tecla == KeyEvent.VK_DOWN || tecla == KeyEvent.VK_S)) this.barra.moverAbajo();
         else if (!pausa && (tecla == KeyEvent.VK_UP || tecla == KeyEvent.VK_W)) this.barra.moverArriba();
@@ -70,7 +70,7 @@ class Juego implements KeyListener, Runnable {
         this.bola.pintar(g);
     }
 
-    private void controlColisiones() throws InterruptedException {
+    private synchronized void controlColisiones() throws InterruptedException {
         int xBola = this.bola.getX();
         int yBola = this.bola.getY();
 
