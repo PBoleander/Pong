@@ -2,7 +2,8 @@ package elementos;
 
 import general.Viewer;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Graphics;
 import java.util.Random;
 
 public class Bola {
@@ -19,22 +20,29 @@ public class Bola {
         reiniciar();
     }
 
-    public void devolver() {
+    public synchronized void devolver() {
         do {
             this.vx = -(10 + random.nextInt(6));
             this.vy = -10 + random.nextInt(21);
         } while (vy == 0 || Math.sqrt(vx * vx + vy * vy) >= DIAMETRO / 1.5);
     }
 
-    public int getX() {
+    public synchronized double getTangenteAngulo() {
+        return (double) this.vy / this.vx;
+    }
+    public synchronized int getVy() {
+        return this.vy;
+    }
+
+    public synchronized int getX() {
         return this.x;
     }
 
-    public int getY() {
+    public synchronized int getY() {
         return this.y;
     }
 
-    public void mover() {
+    public synchronized void mover() {
         if (colisionHorizontal) {
             acelerar();
             vy = -vy;
@@ -55,7 +63,7 @@ public class Bola {
         g.fillOval(x, y, DIAMETRO, DIAMETRO);
     }
 
-    public void reiniciar() {
+    public synchronized void reiniciar() {
         this.x = Viewer.ANCHO - DIAMETRO - 1;
         this.y = 1 + random.nextInt(Viewer.ALTO - DIAMETRO - 1);
 
@@ -73,7 +81,7 @@ public class Bola {
         this.colisionVertical = true;
     }
 
-    private void acelerar() {
+    private synchronized void acelerar() {
         if (Math.sqrt(vx * vx + vy * vy) < DIAMETRO / 2D) {
             this.vx += (vx < 0) ? -1 : 1;
             this.vy += (vy < 0) ? -1 : 1;

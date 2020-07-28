@@ -3,9 +3,11 @@ package general;
 import elementos.Barra;
 import elementos.Bola;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -13,6 +15,7 @@ class Juego implements KeyListener, Runnable {
 
     private final Barra barra;
     private final Bola bola;
+    private final Color colorPorteria = new Color(0, 200, 0, 100);
     private final Font fuente = new Font(Font.DIALOG, Font.BOLD, 30);
 
     private boolean pausa;
@@ -29,9 +32,18 @@ class Juego implements KeyListener, Runnable {
     @Override
     public synchronized void keyPressed(KeyEvent keyEvent) {
         int tecla = keyEvent.getKeyCode();
-        if (!pausa && (tecla == KeyEvent.VK_DOWN || tecla == KeyEvent.VK_S)) this.barra.moverAbajo();
-        else if (!pausa && (tecla == KeyEvent.VK_UP || tecla == KeyEvent.VK_W)) this.barra.moverArriba();
-        else if (tecla == KeyEvent.VK_P) pausarReanudar();
+
+        int xBola = this.bola.getX();
+        int yBola = this.bola.getY();
+        int yBarra = this.barra.getY();
+        Rectangle rBarra = new Rectangle(0, yBarra, Barra.GROSOR, Barra.ALTURA);
+        Rectangle rBola = new Rectangle(xBola, yBola, Bola.DIAMETRO, Bola.DIAMETRO);
+
+        if (tecla == KeyEvent.VK_P) pausarReanudar();
+        else if (!rBarra.intersects(rBola)) {
+            if (!pausa && (tecla == KeyEvent.VK_DOWN || tecla == KeyEvent.VK_S)) this.barra.moverAbajo();
+            else if (!pausa && (tecla == KeyEvent.VK_UP || tecla == KeyEvent.VK_W)) this.barra.moverArriba();
+        }
     }
 
     @Override
@@ -66,6 +78,9 @@ class Juego implements KeyListener, Runnable {
         String golesEnContra = String.valueOf(this.golesEnContra);
         g.drawString(golesEnContra, Viewer.ANCHO - fm.stringWidth(golesEnContra) - Barra.GROSOR - 10, Viewer.ALTO - 10);
 
+        g.setColor(colorPorteria);
+        g.fillRect(0, 0, Barra.GROSOR, Viewer.ALTO);
+
         this.barra.pintar(g);
         this.bola.pintar(g);
     }
@@ -73,8 +88,23 @@ class Juego implements KeyListener, Runnable {
     private synchronized void controlColisiones() throws InterruptedException {
         int xBola = this.bola.getX();
         int yBola = this.bola.getY();
+        int yBarra = this.barra.getY();
 
-        if (xBola <= 0) {
+        if (yBola <= 0 || yBola >= Viewer.ALTO - Bola.DIAMETRO) this.bola.setColisionHorizontal();
+
+        Rectangle rBarra = new Rectangle(0, yBarra, Barra.GROSOR, Barra.ALTURA);
+        Rectangle rBola = new Rectangle(xBola, yBola, Bola.DIAMETRO, Bola.DIAMETRO);
+        if (rBarra.intersects(rBola)) {
+            double m = this.bola.getTangenteAngulo();
+            int yBolaPrima = (int) (yBola + (Bola.DIAMETRO / 2) * (1 - m));
+
+            if (this.bola.getVy() > 0 && yBolaPrima == yBarra) this.bola.setColisionHorizontal();
+            else if (this.bola.getVy() < 0 && yBolaPrima == yBarra + Barra.ALTURA) this.bola.setColisionHorizontal();
+
+            this.bola.setColisionVertical();
+
+            this.toques++;
+        } else if (xBola < Barra.GROSOR) {
             golesEnContra++;
             this.barra.reiniciar();
             this.bola.reiniciar();
@@ -83,48 +113,12 @@ class Juego implements KeyListener, Runnable {
             return;
         } else if (xBola >= Viewer.ANCHO - Bola.DIAMETRO) this.bola.devolver();
 
-        if (yBola <= 0 || yBola >= Viewer.ALTO - Bola.DIAMETRO) this.bola.setColisionHorizontal();
-
-        // Colisiones con la barra
-        int tipoColision = tipoColision(xBola, yBola);
-        switch (tipoColision) {
-            case 1 -> this.bola.setColisionHorizontal();
-            case 2 -> this.bola.setColisionVertical();
-            case 3 -> {
-                this.bola.setColisionHorizontal();
-                this.bola.setColisionVertical();
-            }
-        }
-        if (tipoColision != 0) this.toques++;
-
         this.bola.mover();
-    }
-
-    private int tipoColision(int xBola, int yBola) {
-        int penetracionX = Barra.GROSOR - xBola;
-        int penetracionY = penetracionY(yBola);
-
-        if (penetracionX >= 0 && penetracionY != -1) {
-            if (penetracionX > penetracionY) return 1; // Colisión horizontal
-            else if (penetracionX < penetracionY) return 2; // Colisión vertical
-            else return 3; // Colisión en la esquina
-        }
-        return 0; // Sin colisión
     }
 
     private synchronized void pausarReanudar() {
         this.pausa = !pausa;
         notifyAll();
         if (!this.pausa) iniciar();
-    }
-
-    private int penetracionY(int yBola) {
-        int py = yBola + Bola.DIAMETRO - this.barra.getY();
-        if (py < 0 || py > Barra.ALTURA + Bola.DIAMETRO) return -1; // No hay penetración y
-        else {
-            if (py <= Bola.DIAMETRO) return py;
-            else if (py >= Barra.ALTURA) return Barra.ALTURA - py;
-            else return Bola.DIAMETRO;
-        }
     }
 }

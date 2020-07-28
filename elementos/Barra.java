@@ -16,15 +16,15 @@ public class Barra {
         reiniciar();
     }
 
-    public int getY() {
+    public synchronized int getY() {
         return this.y;
     }
 
-    public void moverAbajo() {
+    public synchronized void moverAbajo() {
         this.y += Math.min(Viewer.ALTO - ALTURA - y, this.velocidad);
     }
 
-    public void moverArriba() {
+    public synchronized void moverArriba() {
         this.y -= Math.min(this.y, this.velocidad);
     }
 
@@ -33,7 +33,7 @@ public class Barra {
         g.fillRect(0, y, GROSOR, ALTURA);
     }
 
-    public void reiniciar() {
+    public synchronized void reiniciar() {
         this.y = (Viewer.ALTO - ALTURA) / 2;
     }
 }
