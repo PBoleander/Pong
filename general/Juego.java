@@ -17,6 +17,7 @@ class Juego implements KeyListener, Runnable {
     private final Bola bola;
     private final Color colorPorteria = new Color(0, 200, 0, 100);
     private final Font fuente = new Font(Font.DIALOG, Font.BOLD, 30);
+    private final Rectangle rBarra, rBola;
 
     private boolean pausa, iniciado;
     private int golesEnContra, toques, toquesMax;
@@ -24,6 +25,8 @@ class Juego implements KeyListener, Runnable {
     Juego() {
         this.barra = new Barra();
         this.bola = new Bola();
+        this.rBarra = new Rectangle();
+        this.rBola = new Rectangle();
     }
 
     @Override
@@ -64,6 +67,7 @@ class Juego implements KeyListener, Runnable {
     }
 
     protected void pintar(Graphics g) {
+        g.setColor(Color.BLACK);
         g.setFont(fuente);
         FontMetrics fm = g.getFontMetrics();
 
@@ -96,8 +100,8 @@ class Juego implements KeyListener, Runnable {
         if (yBola <= 0 || yBola >= Viewer.ALTO - Bola.DIAMETRO) this.bola.setColisionHorizontal();
 
         // Bola pegando en la barra
-        Rectangle rBarra = new Rectangle(0, yBarra, Barra.GROSOR, Barra.ALTURA);
-        Rectangle rBola = new Rectangle(xBola, yBola, Bola.DIAMETRO, Bola.DIAMETRO);
+        this.rBarra.setBounds(0, yBarra, Barra.GROSOR, Barra.ALTURA);
+        this.rBola.setBounds(xBola, yBola, Bola.DIAMETRO, Bola.DIAMETRO);
         if (rBarra.intersects(rBola)) {
             // Coordenada y corregida teniendo en cuenta la dirección de su movimiento (para que si pega en la
             // esquina de la barra rebote y vuelva por donde había venido)
