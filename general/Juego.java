@@ -19,7 +19,7 @@ class Juego implements KeyListener, Runnable {
     private final Font fuente = new Font(Font.DIALOG, Font.BOLD, 30);
 
     private boolean pausa;
-    private int golesEnContra, toques;
+    private int golesEnContra, toques, toquesMax;
 
     Juego() {
         this.barra = new Barra();
@@ -32,18 +32,9 @@ class Juego implements KeyListener, Runnable {
     @Override
     public synchronized void keyPressed(KeyEvent keyEvent) {
         int tecla = keyEvent.getKeyCode();
-
-        int xBola = this.bola.getX();
-        int yBola = this.bola.getY();
-        int yBarra = this.barra.getY();
-        Rectangle rBarra = new Rectangle(0, yBarra, Barra.GROSOR, Barra.ALTURA);
-        Rectangle rBola = new Rectangle(xBola, yBola, Bola.DIAMETRO, Bola.DIAMETRO);
-
         if (tecla == KeyEvent.VK_P) pausarReanudar();
-        else if (!rBarra.intersects(rBola)) {
-            if (!pausa && (tecla == KeyEvent.VK_DOWN || tecla == KeyEvent.VK_S)) this.barra.moverAbajo();
-            else if (!pausa && (tecla == KeyEvent.VK_UP || tecla == KeyEvent.VK_W)) this.barra.moverArriba();
-        }
+        else if (!pausa && (tecla == KeyEvent.VK_DOWN || tecla == KeyEvent.VK_S)) this.barra.moverAbajo();
+        else if (!pausa && (tecla == KeyEvent.VK_UP || tecla == KeyEvent.VK_W)) this.barra.moverArriba();
     }
 
     @Override
@@ -74,6 +65,7 @@ class Juego implements KeyListener, Runnable {
         g.setFont(fuente);
         FontMetrics fm = g.getFontMetrics();
 
+        g.drawString("Récord: " + this.toquesMax, Barra.GROSOR + 10, fm.getHeight() + 10);
         g.drawString(String.valueOf(this.toques), Barra.GROSOR + 10, Viewer.ALTO - 10);
         String golesEnContra = String.valueOf(this.golesEnContra);
         g.drawString(golesEnContra, Viewer.ANCHO - fm.stringWidth(golesEnContra) - Barra.GROSOR - 10, Viewer.ALTO - 10);
@@ -109,6 +101,7 @@ class Juego implements KeyListener, Runnable {
             this.barra.reiniciar();
             this.bola.reiniciar();
             Thread.sleep(1000);
+            if (this.toques > this.toquesMax) this.toquesMax = this.toques;
             this.toques = 0;
             return;
         } else if (xBola >= Viewer.ANCHO - Bola.DIAMETRO) this.bola.devolver();
