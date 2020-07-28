@@ -65,14 +65,17 @@ class Juego implements KeyListener, Runnable {
         g.setFont(fuente);
         FontMetrics fm = g.getFontMetrics();
 
-        g.drawString("Récord: " + this.toquesMax, Barra.GROSOR + 10, fm.getHeight() + 10);
-        g.drawString(String.valueOf(this.toques), Barra.GROSOR + 10, Viewer.ALTO - 10);
+        g.drawString("Récord: " + this.toquesMax, Barra.GROSOR + 10, fm.getHeight() + 10); // Récord toques
+        g.drawString(String.valueOf(this.toques), Barra.GROSOR + 10, Viewer.ALTO - 10); // Toques
+        // Goles en contra
         String golesEnContra = String.valueOf(this.golesEnContra);
         g.drawString(golesEnContra, Viewer.ANCHO - fm.stringWidth(golesEnContra) - Barra.GROSOR - 10, Viewer.ALTO - 10);
 
+        // Portería
         g.setColor(colorPorteria);
         g.fillRect(0, 0, Barra.GROSOR, Viewer.ALTO);
 
+        // Barra y bola
         this.barra.pintar(g);
         this.bola.pintar(g);
     }
@@ -82,29 +85,34 @@ class Juego implements KeyListener, Runnable {
         int yBola = this.bola.getY();
         int yBarra = this.barra.getY();
 
+        // Bola pegando en las paredes de arriba o abajo
         if (yBola <= 0 || yBola >= Viewer.ALTO - Bola.DIAMETRO) this.bola.setColisionHorizontal();
 
+        // Bola pegando en la barra
         Rectangle rBarra = new Rectangle(0, yBarra, Barra.GROSOR, Barra.ALTURA);
         Rectangle rBola = new Rectangle(xBola, yBola, Bola.DIAMETRO, Bola.DIAMETRO);
         if (rBarra.intersects(rBola)) {
-            double m = this.bola.getTangenteAngulo();
-            int yBolaPrima = (int) (yBola + (Bola.DIAMETRO / 2) * (1 - m));
+            // Coordenada y corregida teniendo en cuenta la dirección de su movimiento (para que si pega en la
+            // esquina de la barra rebote y vuelva por donde había venido)
+            int yBolaPrima = (int) (yBola + (Bola.DIAMETRO / 2) * (1 - this.bola.getTangenteAngulo()));
 
+            // Bola pega en una de las esquinas de la barra
             if (this.bola.getVy() > 0 && yBolaPrima == yBarra) this.bola.setColisionHorizontal();
             else if (this.bola.getVy() < 0 && yBolaPrima == yBarra + Barra.ALTURA) this.bola.setColisionHorizontal();
 
+            // Esta colisión siempre se da porque pega en la cara larga
             this.bola.setColisionVertical();
 
             this.toques++;
-        } else if (xBola < Barra.GROSOR) {
+        } else if (xBola < Barra.GROSOR) { // La bola ha entrado en la portería (gol)
             golesEnContra++;
             this.barra.reiniciar();
             this.bola.reiniciar();
             Thread.sleep(1000);
+
             if (this.toques > this.toquesMax) this.toquesMax = this.toques;
             this.toques = 0;
-            return;
-        } else if (xBola >= Viewer.ANCHO - Bola.DIAMETRO) this.bola.devolver();
+        } else if (xBola >= Viewer.ANCHO - Bola.DIAMETRO) this.bola.devolver(); // La bola pega en la pared de salida
 
         this.bola.mover();
     }

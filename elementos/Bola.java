@@ -30,6 +30,7 @@ public class Bola {
     public synchronized double getTangenteAngulo() {
         return (double) this.vy / this.vx;
     }
+
     public synchronized int getVy() {
         return this.vy;
     }
