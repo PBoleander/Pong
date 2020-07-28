@@ -42,7 +42,6 @@ public class Viewer extends Canvas implements Runnable {
     public void run() {
         try {
             while (!isFocusOwner()) requestFocus();
-            this.juego.iniciar();
 
             while (!juego.isPausa()) {
                 repaint();

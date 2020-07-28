@@ -18,7 +18,7 @@ class Juego implements KeyListener, Runnable {
     private final Color colorPorteria = new Color(0, 200, 0, 100);
     private final Font fuente = new Font(Font.DIALOG, Font.BOLD, 30);
 
-    private boolean pausa;
+    private boolean pausa, iniciado;
     private int golesEnContra, toques, toquesMax;
 
     Juego() {
@@ -32,9 +32,15 @@ class Juego implements KeyListener, Runnable {
     @Override
     public synchronized void keyPressed(KeyEvent keyEvent) {
         int tecla = keyEvent.getKeyCode();
-        if (tecla == KeyEvent.VK_P) pausarReanudar();
-        else if (!pausa && (tecla == KeyEvent.VK_DOWN || tecla == KeyEvent.VK_S)) this.barra.moverAbajo();
-        else if (!pausa && (tecla == KeyEvent.VK_UP || tecla == KeyEvent.VK_W)) this.barra.moverArriba();
+        if (iniciado) {
+            if (tecla == KeyEvent.VK_P) pausarReanudar();
+            if (!pausa) {
+                if (tecla == KeyEvent.VK_DOWN || tecla == KeyEvent.VK_S) this.barra.moverAbajo();
+                else if (tecla == KeyEvent.VK_UP || tecla == KeyEvent.VK_W) this.barra.moverArriba();
+            }
+        } else {
+            if (tecla == KeyEvent.VK_E) iniciar();
+        }
     }
 
     @Override
@@ -52,18 +58,19 @@ class Juego implements KeyListener, Runnable {
         }
     }
 
-    protected void iniciar() {
-        new Thread(this).start();
-    }
-
     protected synchronized boolean isPausa() throws InterruptedException {
-        while (pausa) wait();
+        while (pausa || !iniciado) wait();
         return false;
     }
 
     protected void pintar(Graphics g) {
         g.setFont(fuente);
         FontMetrics fm = g.getFontMetrics();
+
+        if (!iniciado) {
+            String texto = "Pulsa E para empezar";
+            g.drawString(texto, (Viewer.ANCHO - fm.stringWidth(texto)) / 2, (Viewer.ALTO + fm.getHeight()) / 2);
+        }
 
         g.drawString("Récord: " + this.toquesMax, Barra.GROSOR + 10, fm.getHeight() + 10); // Récord toques
         g.drawString(String.valueOf(this.toques), Barra.GROSOR + 10, Viewer.ALTO - 10); // Toques
@@ -115,6 +122,12 @@ class Juego implements KeyListener, Runnable {
         } else if (xBola >= Viewer.ANCHO - Bola.DIAMETRO) this.bola.devolver(); // La bola pega en la pared de salida
 
         this.bola.mover();
+    }
+
+    private synchronized void iniciar() {
+        this.iniciado = true;
+        notifyAll();
+        new Thread(this).start();
     }
 
     private synchronized void pausarReanudar() {
