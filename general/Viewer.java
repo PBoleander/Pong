@@ -67,6 +67,6 @@ public class Viewer extends Canvas implements Runnable {
         
         this.juego.pintar(graphics);
 
-        return borrador;
+        return this.borrador;
     }
 }

@@ -27,6 +27,8 @@ class Juego implements KeyListener, Runnable {
         this.bola = new Bola();
         this.rBarra = new Rectangle();
         this.rBola = new Rectangle();
+
+        new Thread(this).start();
     }
 
     @Override
@@ -52,7 +54,7 @@ class Juego implements KeyListener, Runnable {
     @Override
     public void run() {
         try {
-            while (!pausa) {
+            while (!isPausa()) {
                 controlColisiones();
                 Thread.sleep(Viewer.TIEMPO_REFRESCO);
             }
@@ -116,10 +118,10 @@ class Juego implements KeyListener, Runnable {
 
             this.toques++;
         } else if (xBola < Barra.GROSOR) { // La bola ha entrado en la portería (gol)
-            golesEnContra++;
+            Thread.sleep(1000);
+            this.golesEnContra++;
             this.barra.reiniciar();
             this.bola.reiniciar();
-            Thread.sleep(1000);
 
             if (this.toques > this.toquesMax) this.toquesMax = this.toques;
             this.toques = 0;
@@ -131,12 +133,10 @@ class Juego implements KeyListener, Runnable {
     private synchronized void iniciar() {
         this.iniciado = true;
         notifyAll();
-        new Thread(this).start();
     }
 
     private synchronized void pausarReanudar() {
         this.pausa = !pausa;
         notifyAll();
-        if (!this.pausa) iniciar();
     }
 }
