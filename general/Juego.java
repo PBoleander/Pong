@@ -69,7 +69,6 @@ class Juego implements KeyListener, Runnable {
     }
 
     protected void pintar(Graphics g) {
-        g.setColor(Color.BLACK);
         g.setFont(fuente);
         FontMetrics fm = g.getFontMetrics();
 
