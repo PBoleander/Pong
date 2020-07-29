@@ -78,9 +78,9 @@ class Juego implements KeyListener, Runnable {
         }
 
         g.drawString("Récord: " + this.toquesMax, Barra.GROSOR + 10, fm.getHeight() + 10); // Récord toques
-        g.drawString(String.valueOf(this.toques), Barra.GROSOR + 10, Viewer.ALTO - 10); // Toques
+        g.drawString("Paradas: " + this.toques, Barra.GROSOR + 10, Viewer.ALTO - 10); // Toques
         // Goles en contra
-        String golesEnContra = String.valueOf(this.golesEnContra);
+        String golesEnContra = "Goles en contra: " + this.golesEnContra;
         g.drawString(golesEnContra, Viewer.ANCHO - fm.stringWidth(golesEnContra) - Barra.GROSOR - 10, Viewer.ALTO - 10);
 
         // Portería
