@@ -24,7 +24,8 @@ public class Bola {
         do {
             this.vx = -(10 + random.nextInt(6));
             this.vy = -10 + random.nextInt(21);
-        } while (vy == 0 || Math.sqrt(vx * vx + vy * vy) >= DIAMETRO / 1.5);
+        } while (vy == 0 || y + vy > Viewer.ALTO - DIAMETRO || y + vy < 0 ||
+                Math.sqrt(vx * vx + vy * vy) >= DIAMETRO / 1.5);
     }
 
     public synchronized double getTangenteAngulo() {
@@ -71,7 +72,8 @@ public class Bola {
         do {
             this.vx = -(5 + random.nextInt(6));
             this.vy = -10 + random.nextInt(21);
-        } while (vy == 0 || Math.sqrt(vx * vx + vy * vy) >= DIAMETRO / 2D);
+        } while (vy == 0 || y + vy > Viewer.ALTO - DIAMETRO || y + vy < 0 ||
+                Math.sqrt(vx * vx + vy * vy) >= DIAMETRO / 2D);
     }
 
     public void setColisionHorizontal() {
