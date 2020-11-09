@@ -8,7 +8,7 @@ import java.awt.Graphics;
 public class Barra {
 
     public static final int ALTURA = 150;
-    public static int GROSOR = 25;
+    public static final int GROSOR = 25;
     private final int velocidad = 15;
     private int y;
 

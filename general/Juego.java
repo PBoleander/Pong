@@ -63,12 +63,12 @@ class Juego implements KeyListener, Runnable {
         }
     }
 
-    protected synchronized boolean isPausa() throws InterruptedException {
+    synchronized boolean isPausa() throws InterruptedException {
         while (pausa || !iniciado) wait();
         return false;
     }
 
-    protected void pintar(Graphics g) {
+    void pintar(Graphics g) {
         g.setFont(fuente);
         FontMetrics fm = g.getFontMetrics();
 
